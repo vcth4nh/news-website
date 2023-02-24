@@ -9,8 +9,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER check_new_password_trigger
-BEFORE UPDATE ON author
+CREATE TRIGGER tg_check_new_password
+BEFORE UPDATE OF password ON author
 FOR EACH ROW
 EXECUTE FUNCTION check_new_password();
 
@@ -21,44 +21,39 @@ DECLARE
   num_categories INTEGER;
 BEGIN
   SELECT COUNT(*) INTO num_categories FROM news_category WHERE news_id = NEW.news_id;
-  IF num_categories > 5 THEN
+  IF num_categories > 4 THEN
     RAISE EXCEPTION 'News articles can only be associated with up to 5 categories.';
   END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER check_news_categories_trigger
-BEFORE INSERT OR UPDATE ON news_category
+CREATE TRIGGER tg_check_news_categories
+BEFORE INSERT ON news_category
 FOR EACH ROW
 EXECUTE FUNCTION check_news_categories();
 
 -- Updates the category table with a new category if it doesn't already exist,
 -- and inserts a new record into the news_category table with the news_id and category_id
 
-CREATE OR REPLACE FUNCTION insert_news_category() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION tg_check_category() RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO category (name)
-  SELECT NEW.category_name
-  WHERE NOT EXISTS (
-    SELECT 1 FROM category WHERE name = NEW.category_name
-  );
-  
-  INSERT INTO news_category (news_id, category_id)
-  SELECT NEW.id, id
-  FROM category
-  WHERE name = NEW.category_name;
-  
+ 
+  IF EXISTS(
+    SELECT 1 FROM category
+    WHERE name = NEW.name
+  ) THEN RAISE EXCEPTION 'The category has already inserted'
+  END IF;
   RETURN NEW;
-END;
+END
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER after_insert_news
-AFTER INSERT ON news
+CREATE TRIGGER tg_check_category_duplicate
+BEFORE INSERT ON category
 FOR EACH ROW
-EXECUTE FUNCTION insert_news_category();
+EXECUTE FUNCTION tg_check_category();
 
--- Check duplicate keyword asscoiated with same news_id
+-- Check duplicate keyword 
 
 CREATE OR REPLACE FUNCTION check_keyword_update() RETURNS TRIGGER AS $$
 BEGIN
@@ -67,16 +62,36 @@ BEGIN
     WHERE NEW.keyword = keyword
       AND NEW.id <> id
   ) THEN
-    RAISE EXCEPTION 'The updated keyword already exists.';
+    RAISE EXCEPTION 'The keyword already exists.';
   END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER check_keyword_update_trigger
-BEFORE UPDATE ON keyword
+CREATE TRIGGER tg_check_keyword_duplicate
+BEFORE UPDATE OR INSERT ON keyword
 FOR EACH ROW
 EXECUTE FUNCTION check_keyword_update();
+
+-- Check duplicate keyword on a news
+
+CREATE OR REPLACE FUNCTION check_news_keyword_duplicate() RETURNS TRIGGER AS $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM news_keyword
+    WHERE NEW.keyword_id = keyword
+      AND NEW.news_id = news_id
+  ) THEN
+    RAISE EXCEPTION 'The keyword already exists on news.';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tg_check_news_keyword_duplicate
+BEFORE UPDATE OR INSERT ON news_keyword
+FOR EACH ROW
+EXECUTE FUNCTION check_news_keyword_duplicate();
 
 
 
