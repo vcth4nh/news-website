@@ -22,10 +22,8 @@ class DB
     function checkDbConnection($conn): bool
     {
         if ($conn) {
-            echo "Opened database successfully\n";
             return true;
         } else {
-            echo "Error : Unable to open database\n";
             return false;
         }
     }
@@ -47,19 +45,61 @@ class DB
         return $result;
     }
 
+    function select($selectQuery)
+    {
+        $result = $this->executeQuery($selectQuery);
+        $rows = pg_fetch_all($result);
+        return $rows;
+    }
+
+    function getAllNews()
+    {
+        return $this->select("SELECT * FROM news ORDER BY date DESC");
+    }
+
     function searchByTitle($title)
     {
-        return $this->executeQuery("SELECT * FROM news WHERE title LIKE '%$title%' ORDER BY date DESC");
+        return $this->select("SELECT * FROM news WHERE title LIKE '%$title%' ORDER BY date DESC");
     }
 
     function searchByContent($content)
     {
-        return $this->executeQuery("SELECT * FROM news WHERE content LIKE '%$content%' ORDER BY date DESC");
+        return $this->select("SELECT * FROM news WHERE content LIKE '%$content%' ORDER BY date DESC");
     }
 
     function searchByTitleOrContent($search_words)
     {
-        return $this->executeQuery("SELECT * FROM news WHERE title LIKE '%$search_words%' OR content LIKE '%$search_words%' ORDER BY date DESC");
+        return $this->select("SELECT * FROM news WHERE title LIKE '%$search_words%' OR content LIKE '%$search_words%' ORDER BY date DESC");
+    }
+
+    function searchByDate($dateFrom, $dateTo)
+    {
+        return $this->select("SELECT * FROM news WHERE date BETWEEN '$dateFrom' AND '$dateTo' ORDER BY date DESC");
+    }
+
+    function listAllKeyword()
+    {
+        return $this->select("SELECT * FROM keyword");
+    }
+
+    function searchByKeyword($keyword)
+    {
+        return $this->select("SELECT * FROM keyword WHERE keywords ='$keyword' ORDER BY date DESC");
+    }
+
+    function listAllStory()
+    {
+        return $this->select("SELECT * FROM story");
+    }
+
+    function searchByStory($story)
+    {
+        return $this->select("SELECT * FROM story WHERE story = '$story' ORDER BY date DESC");
+    }
+
+    function listCommentFromPost($postID)
+    {
+        return $this->select("SELECT * FROM comment WHERE post_id = '$postID'");
     }
 
     function __destruct()

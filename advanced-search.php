@@ -2,11 +2,28 @@
 session_start();
 $news_list = [];
 
-if (isset($_GET['search'])) {
-    $search = $_GET['search'];
+if (isset($_GET['searchBy'])) {
+    $search = $_GET['search'] ?? '';
+    $searchBy = $_GET['searchBy'];
+    $conn = new DB();
+    switch ($searchBy) {
+        case 'title':
+            $news_list = $conn->searchByTitle($search);
+            break;
+        case 'content':
+            $news_list = $conn->searchByContent($search);
+            break;
+        case 'date':
+            $news_list = $conn->searchByDate($_GET['dateFrom'], $_GET['dateTo']);
+            break;
+        case 'keyword':
+            $news_list = $conn->searchByKeyword($search);
+            break;
+        case 'story':
+            $news_list = $conn->searchByStory($search);
+            break;
+    }
     $news_list = (new DB())->searchByTitleOrContent($search);
-} else {
-    //$news_list = (new DB())->executeQuery("SELECT * FROM news ORDER BY date DESC");
 }
 
 ?>
