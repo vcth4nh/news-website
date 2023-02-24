@@ -63,14 +63,11 @@ EXECUTE FUNCTION insert_news_category();
 CREATE OR REPLACE FUNCTION check_keyword_update() RETURNS TRIGGER AS $$
 BEGIN
   IF EXISTS (
-    SELECT 1 FROM news_keyword
-    WHERE news_id = NEW.news_id
-      AND keyword_id <> NEW.id
-      AND EXISTS (
-        SELECT 1 FROM keyword WHERE id = NEW.id AND keyword = keyword.keyword
-      )
+    SELECT 1 FROM keyword
+    WHERE NEW.keyword = keyword
+      AND NEW.id <> id
   ) THEN
-    RAISE EXCEPTION 'The updated keyword already exists for this news.';
+    RAISE EXCEPTION 'The updated keyword already exists.';
   END IF;
   RETURN NEW;
 END;
