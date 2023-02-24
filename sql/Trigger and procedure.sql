@@ -58,25 +58,29 @@ AFTER INSERT ON news
 FOR EACH ROW
 EXECUTE FUNCTION insert_news_category();
 
--- Remove duplicate keyword associated with same news_id
+-- Check duplicate keyword asscoiated with same news_id
 
-CREATE OR REPLACE FUNCTION remove_duplicate_keywords() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION check_keyword_update() RETURNS TRIGGER AS $$
 BEGIN
-  DELETE FROM keyword
-  WHERE id NOT IN (
-    SELECT MIN(id)
-    FROM keyword
-    GROUP BY news_id, keyword
-  );
-  
+  IF EXISTS (
+    SELECT 1 FROM news_keyword
+    WHERE news_id = NEW.news_id
+      AND keyword_id <> NEW.id
+      AND EXISTS (
+        SELECT 1 FROM keyword WHERE id = NEW.id AND keyword = keyword.keyword
+      )
+  ) THEN
+    RAISE EXCEPTION 'The updated keyword already exists for this news.';
+  END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER after_insert_keyword
-AFTER INSERT ON keyword
+CREATE TRIGGER check_keyword_update_trigger
+BEFORE UPDATE ON keyword
 FOR EACH ROW
-EXECUTE FUNCTION remove_duplicate_keywords();
+EXECUTE FUNCTION check_keyword_update();
+
 
 
 
