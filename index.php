@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-include 'util.php';
+include 'DB.php';
 $news_list = [];
 
 if (isset($_GET['search'])) {

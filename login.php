@@ -11,8 +11,8 @@ if (isset($_SESSION['cred'])) {
     <h2>Login</h2>
     <form action="/api/login.php" method="post">
         <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" class="form-control" id="username" name="email" placeholder="Enter username">
+            <label for="email">Username:</label>
+            <input type="text" class="form-control" id="email" name="email" placeholder="Enter username">
         </div>
         <div class="form-group">
             <label for="password">Password:</label>

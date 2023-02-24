@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'util.php';
+include 'DB.php';
 ?>
 
 <?php include 'template/begin.php' ?>
@@ -9,14 +9,18 @@ include 'util.php';
         <h2>Login</h2>
         <form action="/api/register.php" method="post">
             <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" class="form-control" id="username" name="email" placeholder="Enter username">
+                <label for="full-name">Username:</label>
+                <input type="text" class="form-control" id="full-name" name="fullname" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label for="email">Username:</label>
+                <input type="text" class="form-control" id="email" name="email" placeholder="Enter username">
             </div>
             <div class="form-group">
                 <label for="password">Password:</label>
                 <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
             </div>
-            <button type="submit" class="btn btn-primary">Login</button>
+            <button type="submit" class="btn btn-primary">Register</button>
         </form>
     </div>
 <?php include 'template/end.php' ?>
