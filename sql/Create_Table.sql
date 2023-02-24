@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS author
 CREATE TABLE IF NOT EXISTS news
 (
     id        SERIAL PRIMARY KEY,
+    title     VARCHAR(250) NOT NULL,
     content   TEXT    NOT NULL CHECK (cardinality(regexp_split_to_array(content, '\s+')) >= 10),
     date      TIMESTAMP WITH TIME ZONE DEFAULT now(),
     author_id INTEGER NOT NULL REFERENCES author (id) ON DELETE CASCADE
