@@ -11,7 +11,7 @@ if (isset($_SESSION['cred'])) {
     <h2>Login</h2>
     <form action="/api/login.php" method="post">
         <div class="form-group">
-            <label for="email">Username:</label>
+            <label for="email">Email:</label>
             <input type="text" class="form-control" id="email" name="email" placeholder="Enter username">
         </div>
         <div class="form-group">

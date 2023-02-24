@@ -25,7 +25,7 @@ if (isset($_GET['search'])) {
                     <div class="media-body">
                         <h3 class="mt-0 mb-1"><?= $news['title'] ?></h3>
                         <p><?= substr($news['content'], 0, 200) ?></p>
-                        <a href="#" class="btn btn-primary">Read More</a>
+                        <a href="/news.php?id=<?= $news['id'] ?>" class="btn btn-primary">Read More</a>
                     </div>
                 </li>
             <?php endforeach; ?>

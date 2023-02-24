@@ -11,13 +11,11 @@ if (!isset($_POST['email']) and !isset($_POST['password'])) {
     header("Location: index.php");
 }
 
-$email = $_POST['email'];
-$password = $_POST['password'];
 
-$result = (new DB())->executeQuery("SELECT * FROM author WHERE email = '$email' AND password = '$password'");
-if (pg_num_rows($result) > 0) {
-    $_SESSION['cred'] = pg_fetch_assoc($result);
-    header("Location: /index.php");
-} else {
+$result = (new DB())->register($_POST['fullname'], $_POST['email'], $_POST['password']);
+
+if ($result) {
     header("Location: /login.php");
+} else {
+    header("Location: /register.php");
 }

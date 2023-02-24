@@ -9,11 +9,11 @@ include 'DB.php';
         <h2>Login</h2>
         <form action="/api/register.php" method="post">
             <div class="form-group">
-                <label for="full-name">Username:</label>
+                <label for="full-name">Full name:</label>
                 <input type="text" class="form-control" id="full-name" name="fullname" placeholder="Enter username">
             </div>
             <div class="form-group">
-                <label for="email">Username:</label>
+                <label for="email">Email:</label>
                 <input type="text" class="form-control" id="email" name="email" placeholder="Enter username">
             </div>
             <div class="form-group">
