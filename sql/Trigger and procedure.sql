@@ -21,8 +21,8 @@ DECLARE
   num_categories INTEGER;
 BEGIN
   SELECT COUNT(*) INTO num_categories FROM news_category WHERE news_id = NEW.news_id;
-  IF num_categories > 4 THEN
-    RAISE EXCEPTION 'News articles can only be associated with up to 5 categories.';
+  IF num_categories = 2 THEN
+    RAISE EXCEPTION 'News articles can only be associated with up to 2 categories.';
   END IF;
   RETURN NEW;
 END;
