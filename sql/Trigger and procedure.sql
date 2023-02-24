@@ -14,24 +14,6 @@ BEFORE UPDATE OF password ON author
 FOR EACH ROW
 EXECUTE FUNCTION check_new_password();
 
--- Limit the number of categories associated with a news
-
-CREATE OR REPLACE FUNCTION check_news_categories() RETURNS TRIGGER AS $$
-DECLARE
-  num_categories INTEGER;
-BEGIN
-  SELECT COUNT(*) INTO num_categories FROM news_category WHERE news_id = NEW.news_id;
-  IF num_categories = 2 THEN
-    RAISE EXCEPTION 'News articles can only be associated with up to 2 categories.';
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER tg_check_news_categories
-BEFORE INSERT ON news_category
-FOR EACH ROW
-EXECUTE FUNCTION check_news_categories();
 
 -- Updates the category table with a new category if it doesn't already exist,
 -- and inserts a new record into the news_category table with the news_id and category_id
