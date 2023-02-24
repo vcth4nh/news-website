@@ -62,8 +62,9 @@ CREATE TABLE IF NOT EXISTS keyword
 
 CREATE TABLE IF NOT EXISTS news_keyword
 (
+    news_id    INTEGER NOT NULL REFERENCES news (id) ON DELETE CASCADE,
     keyword_id INTEGER NOT NULL REFERENCES keyword (id) ON DELETE CASCADE,
-    news_id    INTEGER NOT NULL REFERENCES news (id) ON DELETE CASCADE
+    PRIMARY KEY (news_id, keyword_id)
 )
 
 
