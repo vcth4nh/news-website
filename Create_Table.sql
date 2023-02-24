@@ -53,22 +53,3 @@ CREATE TABLE IF NOT EXISTS keyword (
   	news_id INTEGER NOT NULL REFERENCES news(id) ON DELETE CASCADE
 );
 
--- Remove duplicate keyword associated with same news_id
-
-CREATE OR REPLACE FUNCTION remove_duplicate_keywords() RETURNS TRIGGER AS $$
-BEGIN
-  DELETE FROM keyword
-  WHERE id NOT IN (
-    SELECT MIN(id)
-    FROM keyword
-    GROUP BY news_id, keyword
-  );
-  
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER after_insert_keyword
-AFTER INSERT ON keyword
-FOR EACH ROW
-EXECUTE FUNCTION remove_duplicate_keywords();
