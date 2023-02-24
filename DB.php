@@ -48,8 +48,7 @@ class DB
     function select($selectQuery)
     {
         $result = $this->executeQuery($selectQuery);
-        $rows = pg_fetch_all($result);
-        return $rows;
+        return pg_fetch_all($result);
     }
 
     function getAllNews()
@@ -100,6 +99,11 @@ class DB
     function listCommentFromPost($postID)
     {
         return $this->select("SELECT * FROM comment WHERE post_id = '$postID'");
+    }
+
+    function login($email, $password)
+    {
+        return $this->executeQuery("SELECT * FROM author WHERE email = '$email' AND password = '$password'");
     }
 
     function __destruct()
