@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS news
     content   TEXT    NOT NULL CHECK (cardinality(regexp_split_to_array(content, '\s+')) >= 10),
     date      TIMESTAMP WITH TIME ZONE DEFAULT now(),
     author_id INTEGER NOT NULL REFERENCES author (id) ON DELETE CASCADE
+    category_id INTEGER NOT NULL REFERENCES category (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS category
@@ -22,13 +23,6 @@ CREATE TABLE IF NOT EXISTS category
     id          SERIAL PRIMARY KEY,
     name        VARCHAR(255) NOT NULL,
     description TEXT
-);
-
-CREATE TABLE IF NOT EXISTS news_category
-(
-    news_id     INTEGER NOT NULL REFERENCES news (id) ON DELETE CASCADE,
-    category_id INTEGER NOT NULL REFERENCES category (id) ON DELETE CASCADE,
-    PRIMARY KEY (news_id, category_id)
 );
 
 CREATE TABLE IF NOT EXISTS story
