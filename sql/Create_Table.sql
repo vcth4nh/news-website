@@ -4,18 +4,8 @@ CREATE TABLE IF NOT EXISTS author
 (
     id       SERIAL PRIMARY KEY,
     name     VARCHAR(255) NOT NULL,
-    email    VARCHAR(100) NOT NULL UNIQUE CHECK (email LIKE '%@%') ,
+    email    VARCHAR(100) NOT NULL UNIQUE CHECK (email LIKE '%@%'),
     password VARCHAR(255) NOT NULL CHECK (length(password) > 8)
-);
-
-CREATE TABLE IF NOT EXISTS news
-(
-    id        SERIAL PRIMARY KEY,
-    title     VARCHAR(250) NOT NULL,
-    content   TEXT    NOT NULL CHECK (cardinality(regexp_split_to_array(content, '\s+')) >= 10),
-    date      TIMESTAMP WITH TIME ZONE DEFAULT now(),
-    author_id INTEGER NOT NULL REFERENCES author (id) ON DELETE CASCADE
-    category_id INTEGER NOT NULL REFERENCES category (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS category
@@ -23,6 +13,16 @@ CREATE TABLE IF NOT EXISTS category
     id          SERIAL PRIMARY KEY,
     name        VARCHAR(255) NOT NULL,
     description TEXT
+);
+
+CREATE TABLE IF NOT EXISTS news
+(
+    id          SERIAL PRIMARY KEY,
+    title       VARCHAR(250) NOT NULL,
+    content     TEXT         NOT NULL CHECK (cardinality(regexp_split_to_array(content, '\s+')) >= 10),
+    date        TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    author_id   INTEGER      NOT NULL REFERENCES author (id) ON DELETE CASCADE,
+    category_id INTEGER      NOT NULL REFERENCES category (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS story
