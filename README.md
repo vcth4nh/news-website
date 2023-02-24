@@ -8,4 +8,5 @@ Viết file query.sql:
 - Lấy news theo Keyword
 - Lấy news theo khoảng thời gian
 - Sửa news, cả bao gồm sửa keyword, category, story
+- Sửa trigger keyword
 - ...?
