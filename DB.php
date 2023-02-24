@@ -169,4 +169,14 @@ class DB
         $date = date('Y-m-d H:i:s');
         return $this->executeQuery("INSERT INTO comment (news_id, username, content, date) VALUES ($news_id, '$name', '$comment', '$date')");
     }
+
+    function getAllStories(): bool|array
+    {
+        return $this->select("SELECT * FROM story");
+    }
+
+    public function createStoryMap(mixed $story_id, mixed $post_id): \PgSql\Result|bool
+    {
+        return $this->executeQuery("INSERT INTO news_story (story_id, news_id) VALUES ($story_id, $post_id)");
+    }
 }

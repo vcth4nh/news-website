@@ -3,6 +3,7 @@ session_start();
 include 'DB.php';
 $posted = (new DB())->getAllPosts($_SESSION['cred']['id']);
 $categories = (new DB())->getAllCategories();
+$stories = (new DB())->getAllStories();
 ?>
 
 <?php include 'template/begin.php' ?>
@@ -34,6 +35,11 @@ $categories = (new DB())->getAllCategories();
         <?php foreach ($categories as $category): ?>
             <input type="radio" name="category"
                    value="<?php echo $category['id']; ?>"><?php echo $category['name']; ?>
+        <?php endforeach; ?>
+        <h3>Story</h3>
+        <?php foreach ($stories as $story): ?>
+            <input type="checkbox" name="story_id[]"
+                   value="<?php echo $story['id']; ?>"><?php echo $story['title']; ?>
         <?php endforeach; ?>
         <br>
         <button type="submit" class="btn btn-primary">Create Post</button>

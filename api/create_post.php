@@ -10,8 +10,10 @@ if (isset($_POST['title']) && isset($_POST['content'])) {
     $title = $_POST['title'];
     $content = $_POST['content'];
     $category = $_POST['category'];
+
     $result = $conn->createNews($title, $content, $category);
     print_r(pg_fetch_all($result));
+
     $post_id = pg_fetch_all($result)[0]['id'];
     if (isset($_POST['keyword'])) {
         $keyword = explode(',', $_POST['keyword']);
@@ -22,8 +24,16 @@ if (isset($_POST['title']) && isset($_POST['content'])) {
             $conn->createKeywordMap($kw_id, $post_id);
         }
     }
+
+    if (isset($_POST['story_id'])) {
+        $story_id = $_POST['story_id'];
+        foreach ($story_id as $id) {
+            $conn->createStoryMap($id, $post_id);
+        }
+    }
+
     if ($result) {
-        header('Location: /author.php');
+//        header('Location: /author.php');
         exit();
     }
 }

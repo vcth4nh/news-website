@@ -45,15 +45,16 @@ $comments = $conn->listCommentsFromPost($_GET['id']);
                 <?php if ($comments): ?>
                     <?php foreach ($comments as $comment): ?>
                         <div class="comment">
-                            <p class="comment-author"><?= $comment['username'] ?></p>
-                            <p class="comment-date">Posted on <?= $comment['date'] ?></p>
+                            <p class="comment-author">Name: <?= $comment['username'] ?></p>
+                            <p class="comment-date">Commented on <?= $comment['date'] ?></p>
                             <p class="comment-text"><?= $comment['content'] ?></p>
                         </div>
+                        <hr>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <p>No comments yet.</p>
                 <?php endif; ?>
-                <!-- Add new comment form -->
+
                 <div class="add-comment">
                     <h4>Add a Comment</h4>
                     <form action="/api/add_comment.php" method="post">

@@ -23,10 +23,10 @@
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav">
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Categories</a>
+                                <a class="nav-link" href="/advanced-search.php?searchBy=category">Categories</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Story</a>
+                                <a class="nav-link" href="/advanced-search.php?searchBy=story">Story</a>
                             </li>
                             <?php if ($_SERVER['REQUEST_URI'] != '/login.php'): ?>
                                 <?php if (isset($_SESSION['cred'])): ?>
