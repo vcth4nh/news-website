@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS author
 (
     id       SERIAL PRIMARY KEY,
     name     VARCHAR(255) NOT NULL,
-    email    VARCHAR(100) NOT NULL CHECK (email LIKE '%@%'),
+    email    VARCHAR(100) NOT NULL UNIQUE CHECK (email LIKE '%@%') ,
     password VARCHAR(255) NOT NULL CHECK (length(password) > 8)
 );
 
