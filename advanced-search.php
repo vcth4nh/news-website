@@ -1,121 +1,161 @@
 <?php
 session_start();
+include "DB.php";
 $news_list = [];
+$conn = new DB();
+$categories = $conn->getAllCategories();
+$stories = $conn->getAllStories();
 
-if (isset($_GET['searchBy'])) {
-    $search = $_GET['search'] ?? '';
-    $searchBy = $_GET['searchBy'];
-    $conn = new DB();
-    switch ($searchBy) {
-        case 'title':
-            $news_list = $conn->searchByTitle($search);
-            break;
-        case 'content':
-            $news_list = $conn->searchByContent($search);
-            break;
-        case 'date':
-            $news_list = $conn->searchByDate($_GET['dateFrom'], $_GET['dateTo']);
-            break;
-        case 'keyword':
-            $news_list = $conn->searchByKeyword($search);
-            break;
-        case 'story':
-            $news_list = $conn->searchByStory($search);
-            break;
+$title = $_GET['title'] ?? '';
+$content = $_GET['content'] ?? '';
+$dateFrom = $_GET['dateFrom'] ?? '';
+$dateTo = $_GET['dateTo'] ?? '';
+$story = $_GET['story'] ?? '';
+$category = $_GET['category'] ?? '';
+
+$first = true;
+$sql = "SELECT * FROM news WHERE ";
+if ($title != '') {
+    $sql .= "title LIKE '%$title%'";
+    $first = false;
+}
+if ($content != '') {
+    if (!$first) $sql .= " AND ";
+    $sql .= "content LIKE '%$content%'";
+    $first = false;
+}
+if ($dateFrom != '' && $dateTo != '') {
+    if (!$first) $sql .= " AND ";
+    $sql .= "date BETWEEN '$dateFrom' AND '$dateTo'";
+    $first = false;
+}
+if ($category != '') {
+    if (!$first) $sql .= " AND ";
+    $sql .= "category_id = $category";
+    $first = false;
+}
+if ($story != '') {
+    if (!$first) $sql .= " AND ";
+    $sql .= "id in (SELECT news_id FROM news_story WHERE story_id = $story)";
+    $first = false;
+}
+
+if (!$first)
+    $news_list = $conn->select($sql);
+
+$uri = $_SERVER['REQUEST_URI'];
+if (!str_contains($uri, '?')) {
+    $uri .= '?';
+}
+
+function unsetParam(array $param): array
+{
+    $tmp = $_GET;
+    foreach ($param as $item) {
+        unset($tmp[$item]);
     }
-    $news_list = (new DB())->searchByTitleOrContent($search);
+    return $tmp;
+}
+
+function excludeParam($param): string
+{
+    $uri = $_SERVER['REQUEST_URI'];
+    $uri = explode('?', $uri)[0];
+    $uri .= '?';
+    $params = $_GET;
+    unset($params[$param]);
+    foreach ($params as $key => $value) {
+        $uri .= "$key=$value&";
+    }
+    return $uri;
 }
 
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>News Website - List View</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
-<header class="bg-dark text-white">
-    <div class="container">
-        <div class="row">
-            <form action="/" method="GET" id="search"></form>
-            <div class="col-md-4">
-                <div class="input-group">
-                    <input type="text" name="q" class="form-control" placeholder="Search...">
-                    <div class="input-group-append">
-                        <button class="btn btn-light" type="submit" form="search"><i class="fa fa-search"></i></button>
-                    </div>
+
+<?php include_once 'template/begin.php' ?>
+<?php include_once 'template/header.php' ?>
+    <main class="container py-5">
+        <form action="<?= $uri ?>" method="GET">
+            <div class="input-group">
+                <input type="text" name="title" class="form-control" placeholder="Search by title">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">Search</button>
                 </div>
+                <?php foreach (unsetParam(['title']) as $key => $value): ?>
+                    <input type="hidden" name="<?= $key ?>" value="<?= $value ?>">
+                <?php endforeach; ?>
             </div>
-            <div class="col-sm-4">
-                <nav class="navbar navbar-expand-sm navbar-dark">
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav">
-                            <li class="nav-item">
-                                <a class="nav-link" href="/login.php">Author login</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Categories</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Contact</a>
-                            </li>
+        </form>
+        <br>
+        <form action="<?= $uri ?>" method="GET">
+            <div class="input-group">
+                <input type="text" name="content" class="form-control" placeholder="Search by content">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+                <?php foreach (unsetParam(['content']) as $key => $value): ?>
+                    <input type="hidden" name="<?= $key ?>" value="<?= $value ?>">
+                <?php endforeach; ?>
+            </div>
+        </form>
+        <br>
+        <form action="<?= $uri ?>" method="GET">
+            <div class="input-group">
+                <input type="date" name="dateFrom" class="form-control" placeholder="Search by date">
+                <input type="date" name="dateTo" class="form-control" placeholder="Search by date">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+                <?php foreach (unsetParam(['dateFrom', 'dateTo']) as $key => $value): ?>
+                    <input type="hidden" name="<?= $key ?>" value="<?= $value ?>">
+                <?php endforeach; ?>
+            </div>
+        </form>
+        <br>
+        <div class="container">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6 dropdown">
+                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                            Categories
+                            <span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <?php foreach ($categories as $category): ?>
+                                <li>
+                                    <a href="<?= excludeParam('category') ?>category=<?= $category['id']; ?>"><?= $category['name']; ?></a>
+                                </li>
+                            <?php endforeach; ?>
                         </ul>
                     </div>
-                </nav>
-            </div>
-        </div>
-    </div>
-</header>
-<main class="container py-5">
-    <h2 class="text-center mb-4">Latest News</h2>
-    <ul class="list-unstyled">
-        <?php
-        foreach ($news_list as $news):?>
-            <li class="media">
-                <img src="<?= $news['image'] ?? 'https://commons.wikimedia.org/wiki/File:No-Image-Placeholder.svg' ?>"
-                     class="mr-3" alt="Article Image">
-                <div class="media-body">
-                    <h3 class="mt-0 mb-1"><?= $news['title'] ?></h3>
-                    <p><?= $news['brief'] ?></p>
-                    <a href="#" class="btn btn-primary">Read More</a>
+                    <div class="col-sm-6 dropdown">
+                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Stories
+                            <span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <?php foreach ($stories as $story): ?>
+                                <li>
+                                    <a href=<?= excludeParam('story') ?>story=<?= $story['id']; ?>><?= $story['title']; ?></a>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
                 </div>
-            </li>
-        <?php endforeach; ?>
-    </ul>
-</main>
-<footer class="bg-light py-3">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-12">
-                <p class="text-center mb-0">Copyright &copy; 2023 VCT mai dink</p>
             </div>
         </div>
-    </div>
-</footer>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<!--<script>-->
-<!--    const searchInput = document.querySelector('#search-input');-->
-<!--    const searchForm = document.querySelector('#search-form');-->
-<!---->
-<!--    let timerId;-->
-<!--    const delay = 300;-->
-<!---->
-<!--    searchInput.addEventListener('input', () => {-->
-<!--        clearTimeout(timerId);-->
-<!--        timerId = setTimeout(() => {-->
-<!--            if (searchInput.value.trim() !== '') {-->
-<!--                searchForm.submit();-->
-<!--            }-->
-<!--        }, delay);-->
-<!--    });-->
-<!--</script>-->
-</body>
-</html>
-
+        <br>
+        <h3><?= !$first ? "$sql<br>" : ""; ?></h3>
+        <h1>News:</h1>
+        <ul class="list-unstyled">
+            <?php foreach ($news_list as $news): ?>
+                <li class="media m-2">
+                    <img src="<?= $news['image'] ?? 'static/image/no-image.jpg' ?>"
+                         class="mr-3" alt="Article Image" style="width: 150px; height: 150px;">
+                    <div class="media-body">
+                        <h3 class="mt-0 mb-1"><?= $news['title'] ?></h3>
+                        <p><?= substr($news['content'], 0, 200) ?></p>
+                        <a href="/news.php?id=<?= $news['id'] ?>" class="btn btn-primary">Read More</a>
+                    </div>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </main>
+<?php include_once 'template/end.php' ?>

@@ -33,7 +33,7 @@ if (isset($_POST['title']) && isset($_POST['content'])) {
     }
 
     if ($result) {
-//        header('Location: /author.php');
+        header('Location: /author.php');
         exit();
     }
 }

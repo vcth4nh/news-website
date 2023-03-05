@@ -1,9 +1,10 @@
 <?php
 session_start();
 include 'DB.php';
-$posted = (new DB())->getAllPosts($_SESSION['cred']['id']);
-$categories = (new DB())->getAllCategories();
-$stories = (new DB())->getAllStories();
+$db = new DB();
+$posted = $db->getAllPostsByAuthor($_SESSION['cred']['id']);
+$categories = $db->getAllCategories();
+$stories = $db->getAllStories();
 ?>
 
 <?php include 'template/begin.php' ?>
@@ -66,4 +67,3 @@ $stories = (new DB())->getAllStories();
         </tbody>
     </table>
 </div>
-</table>
