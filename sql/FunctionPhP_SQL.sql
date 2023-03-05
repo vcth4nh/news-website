@@ -11,13 +11,13 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Get news by id
-CREATE OR REPLACE FUNCTION search_news_by_id(id INTEGER)
+CREATE OR REPLACE FUNCTION search_news_by_id(news_id INTEGER)
 RETURNS TABLE (id INTEGER, title VARCHAR(250), content TEXT, date TIMESTAMP WITH TIME ZONE, author_id INTEGER, category_id INTEGER) AS $$
 BEGIN
   	RETURN QUERY 
   	SELECT *
 	FROM news 
-	WHERE id = search_news_by_id.id;
+	WHERE id = news_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -70,7 +70,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Search news by author id 
-CREATE OR REPLACE FUNCTION search_news_by_author_id(author_id INTEGER)
+CREATE OR REPLACE FUNCTION search_news_by_author_id(author_id_str INTEGER)
 RETURNS TABLE (
     id INTEGER,
     title VARCHAR(250),
@@ -83,7 +83,7 @@ BEGIN
     RETURN QUERY
     SELECT *
     FROM news
-    WHERE author_id = search_news_by_author_id.author_id;
+    WHERE author_id = author_id_str;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -106,11 +106,11 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Delete news by news_id and author_id
-CREATE OR REPLACE FUNCTION delete_news_by_author_id(id INTEGER, author_id INTEGER)
+CREATE OR REPLACE FUNCTION delete_news_by_author_id(news_id INTEGER, author_id_str INTEGER)
 RETURNS VOID AS $$
 BEGIN
     DELETE FROM news 
-	WHERE id = $1 AND author_id = $2;
+	WHERE id = news_id AND author_id = author_id_str;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -127,13 +127,13 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Search story by id
-CREATE OR REPLACE FUNCTION search_story_by_id(id INTEGER)
+CREATE OR REPLACE FUNCTION search_story_by_id(story_id INTEGER)
 RETURNS TABLE (id INTEGER, title VARCHAR(255), date_start TIMESTAMP WITH TIME ZONE, date_end TIMESTAMP WITH TIME ZONE) AS $$
 BEGIN
   	RETURN QUERY 
 	SELECT *
 	FROM story 
-	WHERE id = search_story_by_id.id;
+	WHERE id = story_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -152,7 +152,7 @@ $$ LANGUAGE plpgsql;
 
 -- Comment
 -- Search comment by news id
-CREATE OR REPLACE FUNCTION search_comment_by_news_id(news_id INTEGER)
+CREATE OR REPLACE FUNCTION search_comment_by_news_id(news_id_str INTEGER)
 RETURNS TABLE (
     id INTEGER,
     username VARCHAR(255),
@@ -164,7 +164,7 @@ BEGIN
     RETURN QUERY
     SELECT *
     FROM comment
-    WHERE news_id = search_comment_by_news_id.news_id;
+    WHERE news_id = news_id_str;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -229,7 +229,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Search keyword by news id
-CREATE OR REPLACE FUNCTION search_keywords_by_news_id(news_id INTEGER)
+CREATE OR REPLACE FUNCTION search_keywords_by_news_id(news_id_str INTEGER)
 RETURNS TABLE (
     id INTEGER,
     keyword TEXT
@@ -239,7 +239,7 @@ BEGIN
     SELECT k.id, k.keyword
     FROM keyword k
     JOIN news_keyword nk ON nk.keyword_id = k.id
-    WHERE nk.news_id = search_keywords_by_news_id.news_id;
+    WHERE nk.news_id = news_id_str;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -271,7 +271,7 @@ BEGIN
     SELECT c.id, c.name, c.description
     FROM category c
     JOIN news n ON n.category_id = c.id
-    WHERE n.id = search_category_by_news_id.news_id;
+    WHERE n.id = news_id;
 END;
 $$ LANGUAGE plpgsql;
 
