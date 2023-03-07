@@ -1,5 +1,3 @@
--- create database NewsPortal
-
 CREATE TABLE IF NOT EXISTS author
 (
     id       SERIAL PRIMARY KEY,
